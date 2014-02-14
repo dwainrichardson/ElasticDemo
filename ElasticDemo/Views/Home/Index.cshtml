@@ -1,0 +1,413 @@
+﻿
+<style>
+    .validate-name-required {
+    }
+
+    .validate-score {
+    }
+</style>
+
+<div class="jumbotron">
+    <h1>Welcome to my Elastic Search</h1>
+   
+</div>
+
+<div class="row" id="formUpload">
+    <div class="col-md-4">
+        <label>Search</label>
+        <input type="text" placeholder="Start typing ......." id="txtSearch" />
+        <input type="button" id="btnSearch" value="Search" class="btn-primary" />
+        <div class="col-md-4 tblhdr" data-bind="style:{display: facetSearch.StateFacet().length > 0 ? 'inline' : 'none' }">State</div>
+            <table class="table table-bordered table-striped">
+            <tbody data-bind="foreach: facetSearch.StateFacet">
+            <tr style="cursor: pointer" >
+                <td class="tbl-button-column">
+                    <input type="checkbox" data-bind="checked: Checked, clickBubble: false, click: $parent.addressSearch" />
+                </td>
+                <td><span data-bind="text: Key"></span> <span style="font-size:x-small" class="muted">(<span data-bind="text: Count"></span>)</span></td>
+            </tr>
+            </tbody>
+           </table>
+
+        
+       
+            <div class="col-md-4 tblhdr" data-bind="style:{display: facetSearch.CityFacet().length > 0 ? 'inline' : 'none' }">City</div>
+            <table class="table table-bordered table-striped">
+                <tbody data-bind="foreach: facetSearch.CityFacet">
+                    <tr style="cursor: pointer">
+                        <td class="tbl-button-column">
+                            <input type="checkbox" data-bind="checked: Checked, clickBubble: false, click: $parent.addressSearch" />
+                        </td>
+                        <td><span data-bind="text: Key"></span> <span style="font-size:x-small" class="muted">(<span data-bind="text: Count"></span>)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        <div class="col-md-4 tblhdr" data-bind="style:{display: facetSearch.NewMsgFacet().length > 0 ? 'inline' : 'none' }">Messages</div>
+        <table class="table table-bordered table-striped">
+            <tbody data-bind="foreach: facetSearch.NewMsgFacet">
+                <tr style="cursor: pointer">
+                    <td class="tbl-button-column">
+                        <input type="checkbox" data-bind="checked: Checked, clickBubble: false, click: $parent.addressSearch" />
+                    </td>
+                    <td><span data-bind="text: Key"></span> <span style="font-size:x-small" class="muted">(<span data-bind="text: Count"></span>)</span></td>
+                </tr>
+            </tbody>
+        </table>
+       
+
+        <div class="col-md-4 tblhdr" data-bind="style:{display: facetSearch.ServiceProviderFacet().length > 0 ? 'inline' : 'none' }">Service Providers</div>
+        <table class="table table-bordered table-striped">
+            <tbody data-bind="foreach: facetSearch.ServiceProviderFacet">
+                <tr style="cursor: pointer">
+                    <td class="tbl-button-column">
+                        <input type="checkbox" data-bind="checked: Checked, clickBubble: false, click: $parent.addressSearch" />
+                    </td>
+                    <td><span data-bind="text: Key"></span> <span style="font-size:x-small" class="muted">(<span data-bind="text: Count"></span>)</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+
+        <div class="col-md-4 tblhdr" data-bind="style:{display: facetSearch.CustomerFacet().length > 0 ? 'inline' : 'none' }">Customers</div>
+        <table class="table table-bordered table-striped">
+            <tbody data-bind="foreach: facetSearch.CustomerFacet">
+                <tr style="cursor: pointer">
+                    <td class="tbl-button-column">
+                        <input type="checkbox" data-bind="checked: Checked, clickBubble: false, click: $parent.addressSearch" />
+                    </td>
+                    <td><span data-bind="text: Key"></span> <span style="font-size:x-small" class="muted">(<span data-bind="text: Count"></span>)</span></td>
+                </tr>
+            </tbody>
+        </table>
+       
+    </div>
+
+
+
+    <div class="col-md-8" data-bind="style:{display: facetSearch.Properties().length > 0 ? 'inline' : 'none'}">
+        <label>Records Per Page</label>
+        <select data-bind="options:pageSizes, value:pageSize"></select>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>DocID</th>
+
+                    <th>FolderID</th>
+                    <th>Port ID</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Order Date</th>
+                    <th>Customer</th>
+                    <th>New Message</th>
+                    <th>VaFHA Type</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: facetSearch.Properties()">
+                <tr>
+                    <td><a data-bind="attr: {href: 'www.google.com?docid=' + DocId, target:'_blank'},text: DocId"></a></td>
+                    <td data-bind="text: DocId"></td>
+                    <td data-bind="text: FolderId"></td>
+                    <td data-bind="text: PortID"></td>
+                    <td data-bind="text: Address"></td>
+                    <td data-bind="text: City"></td>
+                    <td data-bind="text: State"></td>
+                    <td data-bind="text: moment(OrderDate()).format()"></td>
+                    <td data-bind="text: Customer.Name"></td>
+                    <td><input type="checkbox" data-bind="checked:HasNewMsg" /></td>
+                    <td data-bind="text: VaFHAType "></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="12">
+                        <ul class="pager">
+                            <li><a href="#" data-bind="click: setPage">Previous</a></li>
+                            <li><a href="#" data-bind="click: incPage">Next</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4" >
+        <label>File Upload</label>
+        <input type="file" id="filePath"/>
+        <input type="button"  value="Upload"  class="btn-warning" id="btnUpload"/>
+    </div>
+
+
+
+</div>
+<div class="row">
+
+</div><div class="col-lg-12">
+    <table class="table table-bordered table-striped" id="exclTable">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>License #</th>
+                <th>State</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: Exclusions">
+            <tr>
+                <td class="validate-name-required" data-bind="text: FirstName, style:{backgroundColor: FirstNameValid == true ? 'white' : 'red'}"></td>
+                <td class="validate-name-required" data-bind="text: LastName, style:{backgroundColor: LastNameValid == true ? 'white' : 'red'}"></td>
+                <td> <input type="text" class="validate-score" onblur="checkValue(this);" data-bind="value: LicenseNo, style:{backgroundColor : LicenseIsValid() == true ? 'white' : 'red'}" /></td>
+                <td data-bind="text: State, style:{backgroundColor: StateIsValid == true ? 'white' : 'red' }"></td>
+                <td data-bind="text: FilePath"></td>
+                <td><a href="#" data-bind="click: $parent.removeItem">Remove</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+@section scripts{
+<script src="~/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+    <script src="~/Scripts/knockout-3.0.0.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+
+<script src="~/Scripts/knockout.mapping-latest.debug.js"></script>
+
+    <script>
+
+   
+
+        var model = new DocumentModel();
+
+
+        function checkValue(obj) {
+            //alert(obj.val());
+        }
+
+        function DocumentModel() {
+
+            var self = this;
+            self.DocumentID = ko.observable();
+            self.FolderID = ko.observable();
+            self.PortID = ko.observable();
+            self.Docs = ko.observableArray([]);
+            self.OrderDate = ko.observable();
+            self.Customer = ko.observable();
+            self.NewMessage = ko.observable();
+            //self.LicenseNo = ko.observable();
+            self.Exclusions = ko.observableArray([]);
+            self.CityFacets = ko.observableArray([]);
+            self.List = ko.observableArray();
+            self.Properties = ko.observableArray();
+            self.PropertySearch = ko.observable();
+            self.PropertyInfo = ko.observableArray();
+            self.Property = ko.observable();
+            self.facetSearch = ko.observable();
+            self.pageSize = ko.observable();
+
+            self.pageCount = ko.observable(1);
+            self.pageSizes = ko.observableArray([1, 5, 10, 20, 50]);
+            $('#btnSearch').bind("click", makeRequest);
+           // $('#txtSearch').bind("keyup", makeRequest);
+            $('#btnUpload').bind("click", uploadFile);
+          
+            self.pageSize.subscribe(function (item) {
+             
+                self.facetSearch.pageSize(item);
+                if ($('#txtSearch').val() != '') {
+                    $.ajax({
+                        type: 'POST',
+                        url: self.addressSearchApi,
+                        contentType: "application/json;charset=utf-8",
+                        data: ko.mapping.toJSON(self.facetSearch),
+                        success: function (allData) {
+
+                            ko.mapping.fromJS(allData, {}, self.facetSearch);
+                            //ko.utils.arrayForEach(self.facetSearch.Properties(), function (item) {
+                            //    console.log(item.State());
+                            //});
+                            //console.log(self.facetSearch);
+                            self.Properties(allData.Properties);
+                            self.CityFacets(allData.CityFacet);
+
+                        }
+
+                    });
+                }
+            });
+
+            self.removeItem = function (inter) {
+                self.Exclusions.remove(inter);
+
+
+            };
+            self.setPage = function () { };
+            self.incPage = function () { }; self.addressSearchApi = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "ApiSearch" })';
+
+            self.addressSearchApi = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "ApiSearch" })';
+            function Document(data) {
+                this.DocID = ko.observable(data.DocID);
+                this.FolderID = ko.observable(data.FolderID);
+                this.PortID = ko.observable(data.PortID);
+                this.Customer = ko.observable(data.Customer.Name);
+                this.CustomerID = data.Customer.CustomerID;
+                this.OrderDate = ko.observable(data.OrderDate);
+                this.HasNewMsg = data.HasNewMsg;
+                this.VaFHAType = ko.observable(data.VaFHAType);
+                this.Address = ko.observable(data.Address);
+                this.AddressNA = ko.observable(data.AddressNA);
+                this.State = ko.observable(data.State);
+                this.City = ko.observable(data.CityNA);
+                this.ServiceProviderNA = ko.observable(data.ServiceProviderNA);
+                this.ServiceProvider = ko.observable(data.ServiceProvider);
+                this.Facets = ko.observableArray(data.cityFacet);
+            }
+
+            function PropertySearchInformation(data) {
+
+               // this.Properties = ko.observableArray(data.Properties);
+                //this.CityFacet = ko.observableArray(data.CityFacet);
+            }
+
+            function ExlusionaryList(data) {
+                this.FilePath = data.filePath;
+                this.FirstName = ko.observable(data.FirstName);
+                this.FirstNameValid = data.FirstNameValid;
+                this.LastName = ko.observable(data.LastName);
+                this.LastNameValid = data.LastNameValid;
+                this.LicenseNo = ko.observable(data.LicenseNo);
+                this.LicenseIsValid = ko.observable(data.LicenseIsValid)
+               
+                this.LicenseNo.subscribe(function () {
+                    if (this.LicenseNo() != '') {
+                        self.Exclusions.remove(this);
+                        this.LicenseIsValid = ko.observable(true);
+                        
+                    }
+                    self.Exclusions.push(this);
+
+                }.bind(this));
+
+                this.State = ko.observable(data.State);
+                this.StateIsValid = data.StateIsValid;
+                this.DuplicateRow = ko.observable(data.duplicateRow);
+                this.PlanID = data.PlanID;
+
+            }
+            function makeRequest() {
+                   
+                self.facetSearch.SearchText($('#txtSearch').val());
+                $.ajax({
+                    type: 'POST',
+                    url: self.addressSearchApi,
+                    //data: { param: $('#txtSearch').val(), facetSearch: self.facetSearch()},
+                    contentType: "application/json;charset=utf-8",
+                    data: ko.mapping.toJSON(self.facetSearch),
+                    success: function (allData) {
+
+                        // console.log(allData);
+
+                        ko.mapping.fromJS(allData, {}, self.facetSearch);
+
+                        console.log(self.facetSearch.SearchText());
+                        //var mapping = jQuery.map(allData, function (item) { return new PropertyModel(item) });
+
+                        //self.Docs(mapping);
+                        self.Properties(allData.Properties);
+                        self.CityFacets(allData.CityFacet);
+
+                        //if (mapping.length > 0)
+                        //    $('#facetDiv').show();
+                        //else
+                        //    $('#facetDiv').hide();
+                    }
+
+                });
+            }
+
+           
+            self.addressSearch = function (item) {
+                self.facetSearch.SearchText($('#txtSearch').val());
+                if (item.Checked()) {
+                    item.Checked(true);
+                }
+                else
+                    item.Checked(false);
+
+               
+                $.ajax({
+                    type: 'POST',
+                    url: self.addressSearchApi,
+                    contentType: "application/json;charset=utf-8",
+                    data: ko.mapping.toJSON(self.facetSearch),
+                    success: function (allData) {
+                        
+                        ko.mapping.fromJS(allData, {}, self.facetSearch);
+                        //ko.utils.arrayForEach(self.facetSearch.Properties(), function (item) {
+                        //    console.log(item.State());
+                        //});
+                        //console.log(self.facetSearch);
+                        self.Properties(allData.Properties);
+                        self.CityFacets(allData.CityFacet);
+
+                    }
+
+                });
+               
+            };
+
+            function uploadFile() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/HOME/uploadSpreadSheet',
+                    dataType: 'json',
+                    data: { filePath : $('#filePath').val() },
+                    success: function (allData) {
+
+                       // var mapping = ko.utils.arrayMap(item, function (data) {
+                        //    return new ExlusionaryList(data);
+                        //});
+
+                        var mapping = jQuery.map(allData, function (item) { return new ExlusionaryList(item)});
+                        console.log(mapping);
+                        self.Exclusions(mapping);
+                        console.log(self.Exclusions);
+                        $('#exclTable').dataTable();
+                    
+
+                    }
+                });
+            }
+
+            $.ajax({
+                url: self.addressSearchApi,
+                type: 'GET',
+                async: false,
+                success: function (result) {
+                    self.facetSearch = ko.mapping.fromJS(result);
+                    console.log(self.facetSearch.SearchText());
+                    //self.pagedProperties = ko.computed(function () {
+                    //    var page = self.pageFilter();
+                    //    return self.facetSearch.Properties.slice(page * 15, (page + 1) * 15);
+                    //});
+                }
+            });
+
+        }
+           
+           
+
+        $(document).ready(function () {
+            $('#facetDiv').hide();
+
+        
+            var dm = new DocumentModel();
+            ko.applyBindings(dm);         
+        });
+    </script>
+
+}

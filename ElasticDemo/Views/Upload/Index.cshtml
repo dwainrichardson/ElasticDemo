@@ -1,0 +1,179 @@
+﻿
+
+
+<h2>Upload</h2>
+@section scripts{
+    <script src="~/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+    <script src="~/Scripts/knockout-3.0.0.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/knockout.mapping-latest.debug.js"></script>
+
+    <script>
+
+        function UploadModel() {
+            self.UploadList = ko.observableArray();
+            self.addressSearchApi = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "BatchUpload" })';
+            self.pageNumber = ko.observable(1);
+            self.LastName = ko.observable();
+
+            self.LastName.subscribe(function (item) {
+                alert(item);
+            });
+            self.setPage = function () {
+
+                self.UploadList.Action = 'Page';
+                alert(self.UploadList.PageNumber());
+                if (self.UploadList.PageNumber() != 1) {
+                    var currentNumber = self.UploadList.PageNumber() - 1;
+
+                    self.UploadList.PageNumber(currentNumber);
+                    makeRequest();
+                }
+            };
+            self.incPage = function () {
+                self.UploadList.Action = 'Page';
+                var currentNumber = self.UploadList.PageNumber() + 1;
+            
+
+                self.UploadList.filePath($('#filePath').val());
+                self.UploadList.PageNumber(currentNumber);
+                $.ajax({
+                    type: 'POST',
+                    url: self.addressSearchApi,
+                    //data: { param: $('#txtSearch').val(), facetSearch: self.facetSearch()},
+                    contentType: "application/json;charset=utf-8",
+                    data: ko.mapping.toJSON(self.UploadList),
+                    success: function (allData) {
+
+                        // console.log(allData);
+
+                        ko.mapping.fromJS(allData, {}, self.UploadList);
+
+
+
+                        ko.utils.arrayForEach(self.UploadList.Rows(), function (item) {
+                            //alert(item.FirstName);
+                            console.log(item.FirstNameValid());
+                            console.log(item.LastNameValid());
+                        });
+
+                    }
+
+                });
+
+            };
+            $('#btnValidate').bind("click", function () {
+                self.UploadList.Action = 'Validate';
+                makeRequest();
+            });
+            $('#btnUpload').bind("click", function () {
+                self.UploadList.Action = 'Page';
+                makeRequest();
+            });
+            $.ajax({
+                url: self.addressSearchApi,
+                type: 'GET',
+                async: false,
+                success: function (result) {
+                    self.UploadList = ko.mapping.fromJS(result);
+                 
+              
+       
+                    //self.pagedProperties = ko.computed(function () {
+                    //    var page = self.pageFilter();
+                    //    return self.facetSearch.Properties.slice(page * 15, (page + 1) * 15);
+                    //});
+                }
+            });
+
+
+            function validateRecords() {
+
+                self.UploadList.Action = 'Validate';
+                makeRequest();
+            }
+            function makeRequest() {
+
+                self.UploadList.filePath($('#filePath').val());
+                $.ajax({
+                    type: 'POST',
+                    url: self.addressSearchApi,
+                    //data: { param: $('#txtSearch').val(), facetSearch: self.facetSearch()},
+                    contentType: "application/json;charset=utf-8",
+                    data: ko.mapping.toJSON(self.UploadList),
+                    success: function (allData) {
+
+                        // console.log(allData);
+
+                        ko.mapping.fromJS(allData, {}, self.UploadList);
+
+                       
+
+                        ko.utils.arrayForEach(self.UploadList.Rows(), function (item) {
+                            //alert(item.FirstName);
+                            console.log(item.FirstNameValid());
+                            console.log(item.LastNameValid());
+                        });
+
+                    }
+
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            $('#facetDiv').hide();
+
+
+            var dm = new UploadModel();
+            ko.applyBindings(dm);
+        });
+    </script>
+
+    }
+
+
+<div class="row">
+    <div class="col-md-4">
+        <label>File Upload</label>
+        <input type="file" id="filePath" />
+        <input type="button" value="Upload" class="btn-warning" id="btnUpload" />
+        <input type="button" value="Validate" class="btn-success" id="btnValidate" />
+    </div>
+</div>
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    First Name
+                </th>
+                <th>
+                    Last Name
+                </th>
+                <th>License No</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: UploadList.Rows">
+            <tr>
+                <td> <input type="text" data-bind="value: FirstName, style:{backgroundColor: FirstNameValid() ? '' : 'red' }"></td>
+                <td>
+                    <input type="text" data-bind="value: LastName, style:{backgroundColor: LastNameValid()  ? '' : 'red'}" />
+                </td>
+                <td data-bind="text: License, style:{backgroundColor: LicenseIsValid() ? '' : 'red' }"></td>
+                <td><input type="text" data-bind="value: State, style:{backgroundColor: StateIsValid()  ? '' : 'red' }"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="12">
+                    <ul class="pager">
+                        <li><a href="#" data-bind="click: setPage">Previous</a></li>
+                        <li><a href="#" data-bind="click: incPage">Next</a></li>
+                    </ul>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
