@@ -1,4 +1,4 @@
-﻿using Aspose.Cells;
+﻿//using Aspose.Cells;
 using ElasticDemo.Models;
 using System;
 using System.Collections.Concurrent;
@@ -15,6 +15,8 @@ using ServiceStack;
 using Newtonsoft.Json;
 using LinqToExcel;
 using LinqToExcel.Query;
+using Excel;
+using Excel.Core;
 
 namespace ElasticDemo.Controllers
 {
@@ -22,11 +24,28 @@ namespace ElasticDemo.Controllers
     {
         public BatchUploadInformation Get()
         {
+            DwainEntities cte = new DwainEntities();
+
+            var ListTypes = from c in cte.ListTypes
+                            select new Picker { Description = c.Enum, Id = c.ListTypeID };
+
+            var customers = from c in cte.Customers
+                            select new Picker { Description = c.CustomerName, Id= c.CustomerId};
+
+            var lists = from l in cte.AppinstLists
+                        select new Picker { Description = l.ListName, Id = l.AppinstListID };
+
+          
+          
             BatchUploadInformation bui = new BatchUploadInformation()
             {
                 PageNumber = 1,
                  PageSize = 100,
                 filePath = "",
+                 ListName = "",
+                 ListTypes = ListTypes.ToList(),
+                 Customers = customers.ToList(),
+                  CurrentLists  = lists.ToList(),
                 Rows = new List<UploadedFile>(),
                 InValidRows = new List<UploadedFile>()
             };
@@ -66,9 +85,9 @@ namespace ElasticDemo.Controllers
 
             if (current.Rows.Count() == 0 || current.Action == "Page")
             {
-                Workbook wb = new Workbook();
+              //  Workbook wb = new Workbook();
                 string fileName = Path.GetFileName(current.filePath);
-                string directory = @"C:\Users\drichardson\Downloads";
+                string directory = @"C:\Users\RICO\Documents";
                 //wb.Open(Path.Combine(directory, fileName));
 
                 //int rows = wb.Worksheets[0].Cells.MaxDataRow + 1;
@@ -82,7 +101,7 @@ namespace ElasticDemo.Controllers
              
                     
                      string myKey = "LTEHash" + (current.PageNumber - 1).ToString();
-                     var myList = LTEItems.Where(t => t.Key == myKey).FirstOrDefault().Value;
+                     var myList = LTEItems.FirstOrDefault().Value.ToList();// LTEItems.Where(t => t.Key == myKey).FirstOrDefault().Value;
                      ValidateRowErrors(myList);
                      CheckErrors(myList);
 
@@ -95,32 +114,94 @@ namespace ElasticDemo.Controllers
                 }
                 else
                 {
+                //    FileStream stream = File.Open(Path.Combine(directory, fileName),FileMode.Open,FileAccess.Read);
+
+                //    var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                //    reader.IsFirstRowAsColumnNames = true;
+                //    var workSheet = reader.AsDataSet().Tables["Sheet1"];
+                //    var rows = from DataRow a in workSheet.Rows select a;
+                //    //List<UploadedFile> uploadedFiles = new List<UploadedFile>();
+                //    ConcurrentBag<UploadedFile> uploadedFiles = new ConcurrentBag<UploadedFile>();
+                //    Parallel.ForEach(rows, new ParallelOptions { MaxDegreeOfParallelism = 4 }, r => {
+                //        lock (r)
+                //        {
+                //            var file = new UploadedFile()
+                //            {
+                //                License = r["License"].ToString(),
+                //                Street = r["Street"].ToString(),
+                //                Zip = r["Zip"].ToString(),
+                //                FirstName = r["FirstName"].ToString(),
+                //                LastName = r["LastName"].ToString(),
+                //                State = r["State"].ToString(),
+                //                City = r["City"].ToString(),
+                //                StreetNo = r["StreetNo"].ToString()
+
+
+                //            };
+                //            uploadedFiles.Add(file);
+                //        }
+                //    });
+
                     var excelFile = new ExcelQueryFactory(Path.Combine(directory, fileName));
                     var uploadedFiles = from a in excelFile.Worksheet<UploadedFile>("Sheet1") select a;
 
-                    redisDT.SetEntryInHash<string>(LTEHash, "LTEHash", uploadedFiles.ToList());
-                    LTEItems = LTEHash.GetAll();
-                    int count =   uploadedFiles.Count();
-                    int section = count / current.PageSize;
-                    Parallel.For(0, section,  i => {
-                       
-                            int startIndex = i * current.PageSize;
-                            string key = "LTEHash" + i.ToString();
-                            redisDT.SetEntryInHash<string>(LTEHash,  key, uploadedFiles.ToList().Skip(startIndex).Take(current.PageSize).ToList());// LTEItems.FirstOrDefault().Value.Skip(startIndex).Take(current.PageSize).ToList());
-                        
-                    });
-                    ValidateRowErrors(LTEItems.FirstOrDefault().Value);
-                    CheckErrors(LTEItems.FirstOrDefault().Value);
+                    DwainEntities dwe = new DwainEntities();
 
-                    LTEItems.FirstOrDefault().Value.Where(a => a.Errors.Count() > 0).Each(i =>
+                    AppinstList ail = new AppinstList();
+                    ail.FilePath = Path.Combine(directory, fileName);
+                    ail.AppInstId = current.SelectedInstance;
+                    ail.ListName = current.ListName;
+                    ail.CreatedDt = DateTime.Now;
+                    ail.IsDefault = true;
+                    dwe.AppinstLists.Add(ail);
+                    dwe.SaveChanges();
+
+
+                    ConcurrentBag<UploadedFile> concurrent = new ConcurrentBag<UploadedFile>();
+
+                    foreach (var src in uploadedFiles)
                     {
-                        current.InValidRows.Add(i);
-                    });
+                        AppInstListDetail aid = new AppInstListDetail();
+                        aid.FirstName = src.FirstName;
+                        aid.LastName = src.LastName;
+                        aid.LicenseNo = src.License;
+                        aid.State = src.State;
+                        aid.AppInstListTypeID = DetermineListType(src.ListType);
+                        aid.AppInstListID = ail.AppinstListID;
+                        aid.CreatedDt = DateTime.Now;
+                        dwe.AppInstListDetails.Add(aid);
 
-                    LTEItems.FirstOrDefault().Value.Where(a => a.Errors.Count() == 0).Each(i => {
-                        current.Rows.Add(i);
-                    });
-                   // current.Rows = LTEItems.FirstOrDefault().Value.Skip(startRow).Take(current.PageSize).ToList();
+                    }
+
+
+                    dwe.SaveChanges();
+
+                    //redisDT.SetEntryInHash<string>(LTEHash, "LTEHash", uploadedFiles.ToList());
+                    //LTEItems = LTEHash.GetAll();
+                    //int count = uploadedFiles.ToList().Count();
+                    //int section = count / current.PageSize;
+                    //Parallel.For(0, section, i =>
+                    //{
+
+                    //    int startIndex = i * current.PageSize;
+                    //    string key = "LTEHash" + i.ToString();
+                    //    redisDT.SetEntryInHash<string>(LTEHash, key, uploadedFiles.ToList().Skip(startIndex).Take(current.PageSize).ToList());// LTEItems.FirstOrDefault().Value.Skip(startIndex).Take(current.PageSize).ToList());
+
+                    //});
+                    //ValidateRowErrors(LTEItems.FirstOrDefault().Value);
+                    //CheckErrors(LTEItems.FirstOrDefault().Value);
+
+                    ////LTEItems.FirstOrDefault().Value.Where(a => a.Errors.Count() > 0).Each(i =>
+                    ////{
+                    ////    current.InValidRows.Add(i);
+                    ////});
+
+                    ////LTEItems.FirstOrDefault().Value.Where(a => a.Errors.Count() == 0).Each(i => {
+                    ////    current.Rows.Add(i);
+                    ////});
+                    //current.Rows = LTEItems.FirstOrDefault().Value.Skip(startRow).Take(current.PageSize).ToList();
+
+                    //current.Rows = uploadedFiles.ToList().Skip(startRow).Take(current.PageSize).ToList();
 
                 }
                
@@ -205,6 +286,28 @@ namespace ElasticDemo.Controllers
             return current;
         }
 
+        private int DetermineListType(string p)
+        {
+            int val = 1;
+            switch (p)
+            {
+                case "Pre":
+                    val= 1;
+                    break;
+                case "Post":
+                   val =  2;
+                    break;
+                case "Watch":
+                    val = 3;
+                    break;
+                default:
+                    val = 0;
+                    break;
+
+            }
+            return val;
+        }
+
         private static void ValidateRows(ConcurrentBag<UploadedFile> uploadResults)
         {
             Parallel.ForEach(uploadResults.ToList(), res =>
@@ -229,6 +332,15 @@ namespace ElasticDemo.Controllers
                                     break;
                                 case "State":
                                     res.StateIsValid = false;
+                                    break;
+                                case "Zip":
+                                    res.ZipIsValid = false;
+                                    break;
+                                case "Street":
+                                    res.StreetIsValid = false;
+                                    break;
+                                case "ListType":
+                                    res.ListTypeIsValid = false;
                                     break;
                             }
                         }
@@ -270,6 +382,9 @@ namespace ElasticDemo.Controllers
                      row.LastNameValid = true;
                      row.LicenseIsValid = true;
                      row.StateIsValid = true;
+                     row.StreetIsValid = true;
+                     row.ZipIsValid = true;
+                     row.ListTypeIsValid = true;
                      Parallel.ForEach(row.Errors, err =>
                      {
                          lock (err)
@@ -289,6 +404,9 @@ namespace ElasticDemo.Controllers
                                  case "State":
                                      row.StateIsValid = false;
                                      break;
+                                 case "ListType":
+                                     row.ListTypeIsValid = false;
+                                     break;
                              }
                          }
                      });
@@ -298,4 +416,6 @@ namespace ElasticDemo.Controllers
 
          }
     }
+
+
 }

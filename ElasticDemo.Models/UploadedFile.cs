@@ -17,6 +17,16 @@ namespace ElasticDemo.Models
         public bool LastNameValid { get; set; }
         public string License { get; set; }
         public bool LicenseIsValid { get; set; }
+        public string Street { get; set; }
+        public bool StreetIsValid { get; set; }
+        public string Zip { get; set; }
+        public bool ZipIsValid { get; set; }
+        public string StreetNo { get; set; }
+        public string City { get; set; }
+        public bool CityIsValid { get; set; }
+        public string ListType { get; set; }
+        public bool ListTypeIsValid { get; set; }
+
         public bool duplicateRow { get; set; }
         public List<FluentValidation.Results.ValidationFailure> Errors { get; set; }
     }

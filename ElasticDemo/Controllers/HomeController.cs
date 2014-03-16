@@ -6,8 +6,7 @@ using System.Web.Mvc;
 using Nest;
 using Newtonsoft.Json;
 using ElasticDemo.Models;
-using Aspose;
-using Aspose.Cells;
+
 using System.IO;
 using System.Data;
 using System.Threading.Tasks;
@@ -76,11 +75,11 @@ namespace ElasticDemo.Controllers
                     {
                         Document myDoc = new Document()
                         {
-                            Customer = new Customer()
-                            {
-                                CustomerID = i * j,
-                                Name = "Customer" + i.ToString() + j.ToString()
-                            },
+                            //Customer = new Customer()
+                            //{
+                            //    CustomerID = i * j,
+                            //    Name = "Customer" + i.ToString() + j.ToString()
+                            //},
                             DocID = docid + i.ToString() + j.ToString(),
                             FolderID = folderid,
                             OrderDate = DateTime.Now.AddDays(i),
@@ -108,11 +107,11 @@ namespace ElasticDemo.Controllers
 
                         Document myDoc = new Document()
                         {
-                            Customer = new Customer()
-                            {
-                                CustomerID = i * j,
-                                Name = i == j ? "Bank Of America" + i.ToString() + j.ToString() : "Chase QC" + i.ToString() + j.ToString()
-                            },
+                            //Customer = new Customer()
+                            //{
+                            //    CustomerID = i * j,
+                            //    Name = i == j ? "Bank Of America" + i.ToString() + j.ToString() : "Chase QC" + i.ToString() + j.ToString()
+                            //},
                             DocID = docid + i.ToString() + j.ToString(),
                             FolderID = folderid,
                             OrderDate = DateTime.Now.AddDays(i),
@@ -315,10 +314,10 @@ namespace ElasticDemo.Controllers
                         DraftReceivedDtYYYYMM = dr["Date Draft Received"].ToString(),
                         FirstDraftReceivedDtYYYYMM = dr["First Draft Received"].ToString(),
                         DueToCustomerDtYYYYMM = dr["Due to Customer"].ToString(),
-                        CustomerEntity = new Customer()
-                        {
-                            Name = dr["Group"].ToString()
-                        }
+                        //CustomerEntity = new Customer()
+                        //{
+                        //    Name = dr["Group"].ToString()
+                        //}
 
                     };
 
@@ -340,139 +339,139 @@ namespace ElasticDemo.Controllers
         }
 
 
-        public JsonResult getDocuments(string param, PropertySearchInformation PropertyModel)
-        {
+        //public JsonResult getDocuments(string param, PropertySearchInformation PropertyModel)
+        //{
 
 
-            PropertySearchInformation searchResult = new PropertySearchInformation();
+        //    PropertySearchInformation searchResult = new PropertySearchInformation();
 
-            if (string.IsNullOrEmpty(searchResult.SearchText))
-                searchResult.SearchText = param;
-
-
-            var res = ElasticClient.Search<CMSDocument>(s => s
-                .From(0)
-                .Size(20)
-                .Query(q => q.Bool(qb => qb.Must(qm => qm.QueryString(qs => qs.Query(param).OnFields(new List<string>() { "addressna", "address", "customer.name", "cityna", "city", "state", "serviceProviderNA", "docID", "portID" })))))
-                //m => m.Terms("bed","3"))))
-                //.Query(q => q.Bool(qb => qb.Must(qm => qm.Term("portID", param.ToLower()))))
-                .FacetTerm(t => t.OnField(d => d.IsFHA).Size(20))
-                .FacetTerm(t => t.OnField(d => d.VaFHAType).Size(20))
-                .FacetTerm(t => t.OnField("cityNA"))
-                .FacetTerm(t => t.OnField("state"))
-                .FacetTerm(t => t.OnField(d => d.ServiceProviderNA))
-                .FacetTerm(t => t.OnField(d => d.CustomerEntity.Name))
-                .Highlight(h => h.OnFields(f => f.OnField("city"))
-                          .PreTags("<span style='background-color:yellow'>")
-                                              .PostTags("</span>"))
-                );
-            var faceTerm = res.Facet<TermFacet>(t => t.IsFHA);
-
-            var facetIt = res.FacetItems<FacetItem>(p => p.IsFHA);
-
-            List<StringFacetSearchItem> cityFacetResults = res.FacetItems<TermItem>("state")
-                    .Select(item => new StringFacetSearchItem { Key = item.Term, Count = item.Count, Checked = false }).ToList();
+        //    if (string.IsNullOrEmpty(searchResult.SearchText))
+        //        searchResult.SearchText = param;
 
 
-            List<CMSDocument> resultProperties = res.DocumentsWithMetaData
-                .Select<dynamic, CMSDocument>(meta =>
-                {
-                    CMSDocument result = JsonConvert.DeserializeObject<CMSDocument>(JsonConvert.SerializeObject(meta.Source));
-                    return result;
-                }).ToList();
-            searchResult.CityFacet = cityFacetResults;
-            searchResult.Properties = resultProperties;
+        //    var res = ElasticClient.Search<CMSDocument>(s => s
+        //        .From(0)
+        //        .Size(20)
+        //        .Query(q => q.Bool(qb => qb.Must(qm => qm.QueryString(qs => qs.Query(param).OnFields(new List<string>() { "addressna", "address", "customer.name", "cityna", "city", "state", "serviceProviderNA", "docID", "portID" })))))
+        //        //m => m.Terms("bed","3"))))
+        //        //.Query(q => q.Bool(qb => qb.Must(qm => qm.Term("portID", param.ToLower()))))
+        //        .FacetTerm(t => t.OnField(d => d.IsFHA).Size(20))
+        //        .FacetTerm(t => t.OnField(d => d.VaFHAType).Size(20))
+        //        .FacetTerm(t => t.OnField("cityNA"))
+        //        .FacetTerm(t => t.OnField("state"))
+        //        .FacetTerm(t => t.OnField(d => d.ServiceProviderNA))
+        //        .FacetTerm(t => t.OnField(d => d.CustomerEntity.Name))
+        //        .Highlight(h => h.OnFields(f => f.OnField("city"))
+        //                  .PreTags("<span style='background-color:yellow'>")
+        //                                      .PostTags("</span>"))
+        //        );
+        //    var faceTerm = res.Facet<TermFacet>(t => t.IsFHA);
 
-            List<PropertySearchInformation> results = new List<PropertySearchInformation>();
-            results.Add(searchResult);
-            return Json(searchResult, JsonRequestBehavior.AllowGet);
-            //Document doc = new Document();
-            //doc.cityFacet = cityFacetResults;
-            //if (res.Documents.Any())
-            //{
-            //    return Json(res.Documents, JsonRequestBehavior.AllowGet);
-            //}
-            //else
-            //    return Json(doc, JsonRequestBehavior.AllowGet);
-        }
+        //    var facetIt = res.FacetItems<FacetItem>(p => p.IsFHA);
 
-        public JsonResult uploadSpreadSheet(string filePath)
-        {
-
-            Workbook wb = new Workbook();
-            string fileName = Path.GetFileName(filePath);
-            string directory = @"C:\Users\drichardson\Downloads";
-            wb.Open(Path.Combine(directory, fileName));
-
-            int rows = wb.Worksheets[0].Cells.MaxDataRow + 1;
-            int cols = wb.Worksheets[0].Cells.MaxDataColumn + 1;
-            DataTable dt = wb.Worksheets[0].Cells.ExportDataTableAsString(0, 0, rows, cols);
-
-            //List<UploadedFile> uploadResults = new List<UploadedFile>();
-            ConcurrentBag<UploadedFile> uploadResults = new ConcurrentBag<UploadedFile>();
-            string value = string.Empty;
-            States dictStates = new States();
-            Parallel.ForEach(dt.AsEnumerable(), new ParallelOptions() { MaxDegreeOfParallelism = 2 }, entry =>
-            {
-                UploadedFile uf = new UploadedFile();
-                for (int i = 0; i < cols; i++)
-                {
-                    value = entry[i].ToString();
-                    switch (i)
-                    {
-
-                        case 0:
-                            uf.License = value;
-                            if (!string.IsNullOrWhiteSpace(value))
-                            {
-                                uf.LicenseIsValid = true;
-                            }
-
-                            break;
-                        case 1:
-
-                            uf.State = value;
-                            if (string.Compare(dictStates.returnState(value), "No Match Found") != 0)
-                            {
-
-                                uf.StateIsValid = true;
-                            }
-
-                            break;
-                        case 2:
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                uf.FirstName = value;
-                                uf.FirstNameValid = true;
-                            }
-                            break;
-                        case 3:
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                uf.LastName = value;
-                                uf.LastNameValid = true;
-                            }
-
-                            break;
-                    }
+        //    List<StringFacetSearchItem> cityFacetResults = res.FacetItems<TermItem>("state")
+        //            .Select(item => new StringFacetSearchItem { Key = item.Term, Count = item.Count, Checked = false }).ToList();
 
 
-                }
-                if (uploadResults.Where(u => u.License == uf.License && u.State == uf.State).Any())
-                    uf.duplicateRow = true;
+        //    List<CMSDocument> resultProperties = res.DocumentsWithMetaData
+        //        .Select<dynamic, CMSDocument>(meta =>
+        //        {
+        //            CMSDocument result = JsonConvert.DeserializeObject<CMSDocument>(JsonConvert.SerializeObject(meta.Source));
+        //            return result;
+        //        }).ToList();
+        //    searchResult.CityFacet = cityFacetResults;
+        //    searchResult.Properties = resultProperties;
 
-                uploadResults.Add(uf);
+        //    List<PropertySearchInformation> results = new List<PropertySearchInformation>();
+        //    results.Add(searchResult);
+        //    return Json(searchResult, JsonRequestBehavior.AllowGet);
+        //    //Document doc = new Document();
+        //    //doc.cityFacet = cityFacetResults;
+        //    //if (res.Documents.Any())
+        //    //{
+        //    //    return Json(res.Documents, JsonRequestBehavior.AllowGet);
+        //    //}
+        //    //else
+        //    //    return Json(doc, JsonRequestBehavior.AllowGet);
+        //}
 
-            });
+        //public JsonResult uploadSpreadSheet(string filePath)
+        //{
+
+        //    Workbook wb = new Workbook();
+        //    string fileName = Path.GetFileName(filePath);
+        //    string directory = @"C:\Users\drichardson\Downloads";
+        //    wb.Open(Path.Combine(directory, fileName));
+
+        //    int rows = wb.Worksheets[0].Cells.MaxDataRow + 1;
+        //    int cols = wb.Worksheets[0].Cells.MaxDataColumn + 1;
+        //    DataTable dt = wb.Worksheets[0].Cells.ExportDataTableAsString(0, 0, rows, cols);
+
+        //    //List<UploadedFile> uploadResults = new List<UploadedFile>();
+        //    ConcurrentBag<UploadedFile> uploadResults = new ConcurrentBag<UploadedFile>();
+        //    string value = string.Empty;
+        //    States dictStates = new States();
+        //    Parallel.ForEach(dt.AsEnumerable(), new ParallelOptions() { MaxDegreeOfParallelism = 2 }, entry =>
+        //    {
+        //        UploadedFile uf = new UploadedFile();
+        //        for (int i = 0; i < cols; i++)
+        //        {
+        //            value = entry[i].ToString();
+        //            switch (i)
+        //            {
+
+        //                case 0:
+        //                    uf.License = value;
+        //                    if (!string.IsNullOrWhiteSpace(value))
+        //                    {
+        //                        uf.LicenseIsValid = true;
+        //                    }
+
+        //                    break;
+        //                case 1:
+
+        //                    uf.State = value;
+        //                    if (string.Compare(dictStates.returnState(value), "No Match Found") != 0)
+        //                    {
+
+        //                        uf.StateIsValid = true;
+        //                    }
+
+        //                    break;
+        //                case 2:
+        //                    if (!string.IsNullOrEmpty(value))
+        //                    {
+        //                        uf.FirstName = value;
+        //                        uf.FirstNameValid = true;
+        //                    }
+        //                    break;
+        //                case 3:
+        //                    if (!string.IsNullOrEmpty(value))
+        //                    {
+        //                        uf.LastName = value;
+        //                        uf.LastNameValid = true;
+        //                    }
+
+        //                    break;
+        //            }
+
+
+        //        }
+        //        if (uploadResults.Where(u => u.License == uf.License && u.State == uf.State).Any())
+        //            uf.duplicateRow = true;
+
+        //        uploadResults.Add(uf);
+
+        //    });
 
 
 
-            UploadedFile df = new UploadedFile();
-            df.LicenseIsValid = false;
-            uploadResults.Add(df);
+        //    UploadedFile df = new UploadedFile();
+        //    df.LicenseIsValid = false;
+        //    uploadResults.Add(df);
 
-            return Json(uploadResults, JsonRequestBehavior.AllowGet);
-        }
+        //    return Json(uploadResults, JsonRequestBehavior.AllowGet);
+        //}
 
 
 

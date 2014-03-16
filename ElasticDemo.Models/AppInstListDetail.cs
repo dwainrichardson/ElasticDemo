@@ -12,14 +12,16 @@ namespace ElasticDemo.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Customer
+    public partial class AppInstListDetail
     {
-        public int CustomerId { get; set; }
-        public string CustomerName { get; set; }
-        public string AddressLine1 { get; set; }
-        public string City { get; set; }
+        public int AppInstListDetailsID { get; set; }
+        public int AppInstListID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string State { get; set; }
-        public string Zip { get; set; }
-        public string Tel { get; set; }
+        public string LicenseNo { get; set; }
+        public Nullable<int> AppInstListTypeID { get; set; }
+        public Nullable<System.DateTime> CreatedDt { get; set; }
+        public Nullable<int> CreatedByPrsn { get; set; }
     }
 }

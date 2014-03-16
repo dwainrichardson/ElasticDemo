@@ -11,15 +11,152 @@
 
     <script>
 
+        var  ListTypeValue = function(description, value) {
+            this.Description = description;
+            this.Value = value;
+        };
         function UploadModel() {
+
+
+
             self.UploadList = ko.observableArray();
             self.addressSearchApi = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "BatchUpload" })';
             self.pageNumber = ko.observable(1);
             self.LastName = ko.observable();
-
+            self.ListName = ko.observable();
+            self.SelectedList = ko.observable();
+            self.SelectedCustomer = ko.observable();
+            self.SelectedType = ko.observable();
+            self.ListTypes = ko.observableArray();
+            self.Customers = ko.observableArray();
+            self.Lists = ko.observableArray();
+            self.Instances = ko.observableArray();
+            self.SelectedInstance = ko.observable();
+            self.currentInstance = ko.observable();
             self.LastName.subscribe(function (item) {
-                alert(item);
+                //alert(item);
             });
+
+            self.SelectedType.subscribe(function (item) {
+
+
+
+                if (self.UploadList.Rows().length > 0) {
+                    $.ajax({
+                        type: 'POST',
+                       url: 'Upload/RetrieveRows', //self.addressSearchApi,
+                        //data: { param: $('#txtSearch').val(), facetSearch: self.facetSearch()},
+                        contentType: "application/json;charset=utf-8",
+                        data: ko.mapping.toJSON(self.UploadList),
+                        success: function (allData) {
+
+                            // console.log(allData);
+
+                            ko.mapping.fromJS(allData, {}, self.UploadList);
+
+                            var theList = ko.utils.arrayFilter(self.UploadList.Rows(), function (currentItem) {
+                                //.log(currentItem.ListType());
+
+                                if (item.Description() === currentItem.ListType()) {
+                                    //  alert(item.Description());
+                                    //alert(currentItem.ListType());
+                                    return currentItem;
+                                }
+                            });
+                            console.log(theList);
+                            self.UploadList.Rows(theList);
+
+                        }
+
+                    });
+
+
+                }
+            });
+
+            self.SelectedCustomer.subscribe(function (item) {
+                alert(item.Id());
+
+            });
+
+            self.SelectedInstance.subscribe(function (item) {
+                console.log(item);
+                var value = item.Id();
+                self.currentInstance(value);
+
+                self.UploadList.Action = 'RetreiveInformation';
+                self.UploadList.ListName = self.ListName();
+                self.UploadList.SelectedInstance = self.currentInstance();
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'Upload/RetrieveInformation',
+                    //data: { param: $('#txtSearch').val(), facetSearch: self.facetSearch()},
+                    contentType: "application/json;charset=utf-8",
+                    data: ko.mapping.toJSON(self.UploadList),
+                    success: function (allData) {
+
+                        // console.log(allData);
+
+                        ko.mapping.fromJS(allData, {}, self.UploadList);
+
+                        self.Customers = self.UploadList.Customers();
+                        self.Lists(self.UploadList.CurrentLists());
+                        self.ListTypes = self.UploadList.ListTypes();
+                        //self.Instances = self.UploadList.Instances();
+
+                        //console.log(self.Lists);
+
+
+
+
+                    }
+
+                });
+
+
+            });
+            self.SelectedList.subscribe(function (item) {
+                var value = item.Id();
+
+
+                self.UploadList.Action = 'RetreiveRows';
+                self.UploadList.ListName = self.ListName();
+                self.UploadList.SelectedInstance = self.currentInstance();
+                self.UploadList.SelectedList = value;
+                $.ajax({
+                    type: 'POST',
+                    url: 'Upload/RetrieveRows',
+                    //data: { param: $('#txtSearch').val(), facetSearch: self.facetSearch()},
+                    contentType: "application/json;charset=utf-8",
+                    data: ko.mapping.toJSON(self.UploadList),
+                    success: function (allData) {
+
+                        // console.log(allData);
+
+                        ko.mapping.fromJS(allData, {}, self.UploadList);
+
+                        //self.Customers = self.UploadList.Customers();
+                       // self.Lists(self.UploadList.CurrentLists());
+                       // self.ListTypes = self.UploadList.ListTypes();
+                        //self.Instances = self.UploadList.Instances();
+
+                        //console.log(self.Lists);
+
+
+
+
+                    }
+
+                });
+
+
+            });
+            //self.calculateLists = ko.computed(function () {
+            //    self.ListTypes.push(new ListTypeValue("PRE", "1"));
+            //    self.ListTypes.push(new ListTypeValue("POST", "2"));
+            //    self.ListTypes.push(new ListTypeValue("WATCHLIST", "3"));
+            //});
             self.setPage = function () {
 
                 self.UploadList.Action = 'Page';
@@ -34,7 +171,7 @@
             self.incPage = function () {
                 self.UploadList.Action = 'Page';
                 var currentNumber = self.UploadList.PageNumber() + 1;
-            
+
 
                 self.UploadList.filePath($('#filePath').val());
                 self.UploadList.PageNumber(currentNumber);
@@ -69,17 +206,21 @@
             });
             $('#btnUpload').bind("click", function () {
                 self.UploadList.Action = 'Page';
+                self.UploadList.ListName = self.ListName();
+                self.UploadList.SelectedInstance = self.currentInstance();
                 makeRequest();
             });
             $.ajax({
-                url: self.addressSearchApi,
+                url: 'Upload/GetInformation',//self.addressSearchApi,
                 type: 'GET',
                 async: false,
                 success: function (result) {
+                    console.log(result);
                     self.UploadList = ko.mapping.fromJS(result);
-                 
-              
-       
+                  self.Customers = self.UploadList.Customers();
+                 // self.Lists = self.UploadList.CurrentLists();
+                  self.ListTypes = self.UploadList.ListTypes();
+                  self.Instances = self.UploadList.Instances();
                     //self.pagedProperties = ko.computed(function () {
                     //    var page = self.pageFilter();
                     //    return self.facetSearch.Properties.slice(page * 15, (page + 1) * 15);
@@ -108,7 +249,7 @@
 
                         ko.mapping.fromJS(allData, {}, self.UploadList);
 
-                       
+
 
                         ko.utils.arrayForEach(self.UploadList.Rows(), function (item) {
                             //alert(item.FirstName);
@@ -131,18 +272,76 @@
         });
     </script>
 
-    }
+}
 
 
 <div class="row">
     <div class="col-md-4">
         <label>File Upload</label>
+
         <input type="file" id="filePath" />
+        <select data-bind="options: Instances, optionsText: 'Description', value: SelectedInstance, optionsCaption: 'Select One'"></select>
+        <select data-bind="options: Lists, optionsText: 'Description', value: SelectedList, optionsCaption:'Select One'"></select>
+
         <input type="button" value="Upload" class="btn-warning" id="btnUpload" />
         <input type="button" value="Validate" class="btn-success" id="btnValidate" />
     </div>
+
 </div>
 <div class="row">
+    <div class="col-md-4">
+        <label>List Name</label>
+        <input type="text" data-bind="value: ListName" />
+    </div>
+    <div class="col-md-4">
+        <select data-bind="options: ListTypes, optionsText: 'Description', value: SelectedType, optionsCaption: 'Select One'"></select>
+        <select data-bind="options: Customers, optionsText: 'Description', value: SelectedCustomer"></select>
+
+    </div>
+</div>
+<div>
+    <a href="#" onclick="">Valid</a>
+    <a href="#" onclick="">InValid</a>
+</div>
+
+@*<div class="row" id="valid">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th>License No</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: UploadList.InValidRows">
+                <tr>
+                    <td> <input type="text" data-bind="value: FirstName, style:{backgroundColor: FirstNameValid() ? '' : 'red' }"></td>
+                    <td>
+                        <input type="text" data-bind="value: LastName, style:{backgroundColor: LastNameValid()  ? '' : 'red'}" />
+                    </td>
+                    <td data-bind="text: License, style:{backgroundColor: LicenseIsValid() ? '' : 'red' }"></td>
+                    <td><input type="text" data-bind="value: State, style:{backgroundColor: StateIsValid()  ? '' : 'red' }"></td>
+                    <td><input type="text" data-bind="value: ListType, style:{backgroundColor: ListTypeIsValid ? '' : 'red'}" /></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="12">
+                        <ul class="pager">
+                            <li><a href="#" data-bind="click: setPage">Previous</a></li>
+                            <li><a href="#" data-bind="click: incPage">Next</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>*@
+
+<div class="row" id="InValid">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -153,6 +352,8 @@
                     Last Name
                 </th>
                 <th>License No</th>
+                <th>State</th>
+                <th>List Type</th>
             </tr>
         </thead>
         <tbody data-bind="foreach: UploadList.Rows">
@@ -161,8 +362,10 @@
                 <td>
                     <input type="text" data-bind="value: LastName, style:{backgroundColor: LastNameValid()  ? '' : 'red'}" />
                 </td>
-                <td data-bind="text: License, style:{backgroundColor: LicenseIsValid() ? '' : 'red' }"></td>
+                <td> <input type="text" data-bind="value: License, style:{backgroundColor: LicenseIsValid() ? '' : 'red' }" /></td>
                 <td><input type="text" data-bind="value: State, style:{backgroundColor: StateIsValid()  ? '' : 'red' }"></td>
+                <td><input type="text" data-bind="value: ListType, style:{backgroundColor: ListTypeIsValid ? '' : 'red'}" /></td>
+                <td><input type="submit" value="Save" /></td>
             </tr>
         </tbody>
         <tfoot>

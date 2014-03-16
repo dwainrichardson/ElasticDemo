@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="DwainModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AppInst">
+          <Key>
+            <PropertyRef Name="AppInstId" />
+          </Key>
+          <Property Name="AppInstId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AppInstName" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AppInstListDetails">
+          <Key>
+            <PropertyRef Name="AppInstListDetailsID" />
+          </Key>
+          <Property Name="AppInstListDetailsID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AppInstListID" Type="int" Nullable="false" />
+          <Property Name="FirstName" Type="varchar" MaxLength="50" />
+          <Property Name="LastName" Type="varchar" MaxLength="50" />
+          <Property Name="State" Type="varchar" MaxLength="2" />
+          <Property Name="LicenseNo" Type="varchar" MaxLength="50" />
+          <Property Name="AppInstListTypeID" Type="int" />
+          <Property Name="CreatedDt" Type="datetime" />
+          <Property Name="CreatedByPrsn" Type="int" />
+        </EntityType>
+        <EntityType Name="AppinstLists">
+          <Key>
+            <PropertyRef Name="AppinstListID" />
+          </Key>
+          <Property Name="AppinstListID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ListName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="FilePath" Type="varchar" MaxLength="300" Nullable="false" />
+          <Property Name="CreatedDt" Type="datetime" Nullable="false" />
+          <Property Name="IsDefault" Type="bit" Nullable="false" />
+          <Property Name="ListTypeID" Type="int" Nullable="false" />
+          <Property Name="AppInstId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Customer">
+          <Key>
+            <PropertyRef Name="CustomerId" />
+          </Key>
+          <Property Name="CustomerId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerName" Type="varchar" MaxLength="50" />
+          <Property Name="AddressLine1" Type="varchar" MaxLength="50" />
+          <Property Name="City" Type="varchar" MaxLength="50" />
+          <Property Name="State" Type="varchar" MaxLength="2" />
+          <Property Name="Zip" Type="varchar" MaxLength="10" />
+          <Property Name="Tel" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ListType">
+          <Key>
+            <PropertyRef Name="ListTypeID" />
+          </Key>
+          <Property Name="ListTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="50" />
+          <Property Name="Enum" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityContainer Name="DwainModelStoreContainer">
+          <EntitySet Name="AppInst" EntityType="Self.AppInst" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AppInstListDetails" EntityType="Self.AppInstListDetails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AppinstLists" EntityType="Self.AppinstLists" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Customer" EntityType="Self.Customer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ListType" EntityType="Self.ListType" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DwainModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Customer">
+          <Key>
+            <PropertyRef Name="CustomerId" />
+          </Key>
+          <Property Name="CustomerId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AddressLine1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="State" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="Zip" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Tel" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ListType">
+          <Key>
+            <PropertyRef Name="ListTypeID" />
+          </Key>
+          <Property Name="ListTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Enum" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="DwainEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Customers" EntityType="Self.Customer" />
+          <EntitySet Name="ListTypes" EntityType="Self.ListType" />
+          <EntitySet Name="AppinstLists" EntityType="DwainModel.AppinstList" />
+          <EntitySet Name="AppInstListDetails" EntityType="DwainModel.AppInstListDetail" />
+          <EntitySet Name="AppInsts" EntityType="DwainModel.AppInst" />
+        </EntityContainer>
+        <EntityType Name="AppinstList">
+          <Key>
+            <PropertyRef Name="AppinstListID" />
+          </Key>
+          <Property Name="AppinstListID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ListName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="FilePath" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
+          <Property Name="ListTypeID" Type="Int32" Nullable="false" />
+          <Property Name="AppInstId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AppInstListDetail">
+          <Key>
+            <PropertyRef Name="AppInstListDetailsID" />
+          </Key>
+          <Property Name="AppInstListDetailsID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AppInstListID" Type="Int32" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="State" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="LicenseNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AppInstListTypeID" Type="Int32" />
+          <Property Name="CreatedDt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedByPrsn" Type="Int32" />
+        </EntityType>
+        <EntityType Name="AppInst">
+          <Key>
+            <PropertyRef Name="AppInstId" />
+          </Key>
+          <Property Name="AppInstId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AppInstName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DwainModelStoreContainer" CdmEntityContainer="DwainEntities">
+          <EntitySetMapping Name="Customers">
+            <EntityTypeMapping TypeName="DwainModel.Customer">
+              <MappingFragment StoreEntitySet="Customer">
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="AddressLine1" ColumnName="AddressLine1" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="Zip" ColumnName="Zip" />
+                <ScalarProperty Name="Tel" ColumnName="Tel" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ListTypes">
+            <EntityTypeMapping TypeName="DwainModel.ListType">
+              <MappingFragment StoreEntitySet="ListType">
+                <ScalarProperty Name="ListTypeID" ColumnName="ListTypeID" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Enum" ColumnName="Enum" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AppinstLists">
+            <EntityTypeMapping TypeName="DwainModel.AppinstList">
+              <MappingFragment StoreEntitySet="AppinstLists">
+                <ScalarProperty Name="AppInstId" ColumnName="AppInstId" />
+                <ScalarProperty Name="ListTypeID" ColumnName="ListTypeID" />
+                <ScalarProperty Name="IsDefault" ColumnName="IsDefault" />
+                <ScalarProperty Name="CreatedDt" ColumnName="CreatedDt" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="ListName" ColumnName="ListName" />
+                <ScalarProperty Name="AppinstListID" ColumnName="AppinstListID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AppInstListDetails">
+            <EntityTypeMapping TypeName="DwainModel.AppInstListDetail">
+              <MappingFragment StoreEntitySet="AppInstListDetails">
+                <ScalarProperty Name="CreatedByPrsn" ColumnName="CreatedByPrsn" />
+                <ScalarProperty Name="CreatedDt" ColumnName="CreatedDt" />
+                <ScalarProperty Name="AppInstListTypeID" ColumnName="AppInstListTypeID" />
+                <ScalarProperty Name="LicenseNo" ColumnName="LicenseNo" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="AppInstListID" ColumnName="AppInstListID" />
+                <ScalarProperty Name="AppInstListDetailsID" ColumnName="AppInstListDetailsID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AppInsts">
+            <EntityTypeMapping TypeName="DwainModel.AppInst">
+              <MappingFragment StoreEntitySet="AppInst">
+                <ScalarProperty Name="AppInstName" ColumnName="AppInstName" />
+                <ScalarProperty Name="AppInstId" ColumnName="AppInstId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -39,11 +39,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aspose.Cells">
-      <HintPath>R:\Current\Aspose.Cells.dll</HintPath>
+    <Reference Include="Excel">
+      <HintPath>..\packages\ExcelDataReader.2.1.1\lib\net20\Excel.dll</HintPath>
     </Reference>
     <Reference Include="FluentValidation">
-      <HintPath>..\..\..\..\FluentValidation\FluentValidation\FluentValidation.dll</HintPath>
+      <HintPath>..\packages\FluentValidation.5.0.0.1\lib\Net40\FluentValidation.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\ExcelDataReader.2.1.1\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="LinqToExcel">
       <HintPath>..\packages\LinqToExcel.1.7.1\lib\LinqToExcel.dll</HintPath>
@@ -56,7 +59,7 @@
       <HintPath>..\packages\Mvc.JQuery.Datatables.1.2.92\lib\net40\Mvc.JQuery.Datatables.dll</HintPath>
     </Reference>
     <Reference Include="Nest">
-      <HintPath>..\..\..\..\Samples\NEST-master\src\Nest\bin\Debug\Nest.dll</HintPath>
+      <HintPath>..\packages\NEST.0.12.0.0\lib\NET4\Nest.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -212,6 +215,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiSearchController.cs" />
     <Compile Include="Controllers\BatchUploadController.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Global.asax.cs">

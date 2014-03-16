@@ -32,7 +32,11 @@ namespace ElasticDemo.Models
             RuleFor(b => b.FirstName).NotEmpty();
             RuleFor(b => b.License).NotEmpty();
             RuleFor(b => b.State).SetValidator(new StateMustExist());
+            RuleFor(b => b.ListType).SetValidator(new ListTypeMustExist());
             RuleFor(b => b.LastName).NotEmpty();
+            RuleFor(b => b.City).NotEmpty();
+            RuleFor(b => b.Street).NotEmpty();
+            RuleFor(b => b.Zip).NotEmpty();
         }
     }
 
@@ -58,6 +62,34 @@ namespace ElasticDemo.Models
                 return true;
             }
 
+        }
+
+    }
+
+    public class ListTypeMustExist : PropertyValidator
+    {
+        public ListTypeMustExist()
+            : base("List Type {ListType} does not exist")
+        {
+
+        }
+
+        protected override bool IsValid(PropertyValidatorContext context)
+        {
+            List<string> validTypes = new List<string>();
+            validTypes.Add("PRE");
+            validTypes.Add("POST");
+            validTypes.Add("WATCH");
+
+            var value = context.PropertyValue as string;
+            if(!string.IsNullOrEmpty(value)){
+            if (validTypes.Contains(value.ToUpper()))
+                return true;
+            else return false;
+            }else
+        	{
+                return false;
+	        }
         }
 
     }
